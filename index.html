@@ -8,10 +8,11 @@
 body {
     background: #020617;
     color: white;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
     padding-top: 60px;
 }
+
 .box {
     background: #020617;
     border: 2px solid #22c55e;
@@ -21,6 +22,7 @@ body {
     max-width: 380px;
     margin: auto;
 }
+
 button {
     background: #22c55e;
     border: none;
@@ -29,15 +31,18 @@ button {
     border-radius: 8px;
     cursor: pointer;
 }
+
 button:disabled {
     background: #555;
 }
+
 .key {
     margin-top: 15px;
     font-size: 18px;
     color: #38bdf8;
     word-break: break-all;
 }
+
 .note {
     margin-top: 10px;
     font-size: 14px;
@@ -49,16 +54,26 @@ button:disabled {
 <body>
 
 <div class="box">
-    <h2>🔑 LOLIBEO GET KEY</h2>
-    <p>Bấm GET KEY → vượt link → nhận key</p>
+    <h2>Kiwi Hub Key Sytems</h2>
+    <p>Bấm <b>Get Key</b> → Nhận Key 24h</p>
 
-    <button id="btn" onclick="startGetKey()">Get Key</button>
+    <button id="btn" onclick="startGetKey()">GET KEY</button>
 
     <div class="note" id="status">Chưa lấy key</div>
     <div class="key" id="keyBox"></div>
 </div>
 
 <script>
+/* ================== CONFIG ================== */
+
+// ⏰ KEY SỐNG 24 GIỜ
+const KEY_LIFETIME = 24 * 60 * 60 * 1000;
+
+// 🔴 LINK4M CỦA BẠN (ĐÃ THAY)
+const LINK4M_URL = "https://link4m.com/mWbel";
+
+/* ============================================ */
+
 // 🔐 TẠO KEY RANDOM
 function makeKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -69,24 +84,48 @@ function makeKey() {
     return key;
 }
 
-// 👉 BẤM GET KEY → CHUYỂN LINK VƯỢT
+// 👉 BẤM GET KEY → CHUYỂN LINK4M
 function startGetKey() {
     document.getElementById("status").innerText = "Đang chuyển tới link vượt...";
     document.getElementById("btn").disabled = true;
-
-    // 🔴 DÁN LINK4M CỦA BẠN (link này redirect về ?verified=1)
-    window.location.href = "https://link4m.com/mWbel";
+    window.location.href = LINK4M_URL;
 }
 
-// ✅ KHI QUAY LẠI WEB SAU KHI VƯỢT
+// ✅ KHI QUAY LẠI WEB
 window.onload = function () {
     const url = new URL(window.location.href);
     const verified = url.searchParams.get("verified");
 
+    const used = localStorage.getItem("key_used");
+    const savedKey = localStorage.getItem("getkey_key");
+    const savedTime = localStorage.getItem("getkey_time");
+
+    // ❌ Key đã dùng
+    if (used === "1") {
+        document.getElementById("status").innerText = "Key đã được sử dụng";
+        return;
+    }
+
+    // ⏳ Key còn hạn
+    if (savedKey && savedTime) {
+        if (Date.now() - Number(savedTime) < KEY_LIFETIME) {
+            document.getElementById("keyBox").innerText = savedKey;
+            document.getElementById("status").innerText = "Hạn Sử Dụng 24H";
+            return;
+        } else {
+            localStorage.clear();
+        }
+    }
+
+    // 🎉 VƯỢT LINK XONG
     if (verified === "1") {
         const key = makeKey();
+        localStorage.setItem("getkey_key", key);
+        localStorage.setItem("getkey_time", Date.now());
+        localStorage.setItem("key_used", "0");
+
         document.getElementById("keyBox").innerText = key;
-        document.getElementById("status").innerText = "Xác minh thành công";
+        document.getElementById("status").innerText = "🎉 Lấy Key Thành Công";
         document.getElementById("btn").disabled = false;
     }
 };
