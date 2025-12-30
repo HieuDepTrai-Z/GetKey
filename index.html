@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>LoliBeo Get Key</title>
+
+<style>
+body {
+    background: #020617;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    padding-top: 60px;
+}
+.box {
+    background: #020617;
+    border: 2px solid #22c55e;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 380px;
+    margin: auto;
+}
+button {
+    background: #22c55e;
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button:disabled {
+    background: #555;
+}
+.key {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #38bdf8;
+    word-break: break-all;
+}
+.note {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #a1a1aa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>🔑 LOLIBEO GET KEY</h2>
+    <p>Bấm GET KEY → vượt link → nhận key</p>
+
+    <button id="btn" onclick="startGetKey()">Get Key</button>
+
+    <div class="note" id="status">Chưa lấy key</div>
+    <div class="key" id="keyBox"></div>
+</div>
+
+<script>
+// 🔐 TẠO KEY RANDOM
+function makeKey() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let key = "Kiwi-";
+    for (let i = 0; i < 12; i++) {
+        key += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return key;
+}
+
+// 👉 BẤM GET KEY → CHUYỂN LINK VƯỢT
+function startGetKey() {
+    document.getElementById("status").innerText = "Đang chuyển tới link vượt...";
+    document.getElementById("btn").disabled = true;
+
+    // 🔴 DÁN LINK4M CỦA BẠN (link này redirect về ?verified=1)
+    window.location.href = "https://link4m.com/ooep8R";
+}
+
+// ✅ KHI QUAY LẠI WEB SAU KHI VƯỢT
+window.onload = function () {
+    const url = new URL(window.location.href);
+    const verified = url.searchParams.get("verified");
+
+    if (verified === "1") {
+        const key = makeKey();
+        document.getElementById("keyBox").innerText = key;
+        document.getElementById("status").innerText = "Xác minh thành công";
+        document.getElementById("btn").disabled = false;
+    }
+};
+</script>
+
+</body>
+</html>
