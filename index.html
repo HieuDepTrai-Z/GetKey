@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Key Sytems</title>
+<title>Kiwi Key Sytems</title>
 
 <style>
 body {
@@ -48,33 +48,35 @@ button:disabled {
     font-size: 14px;
     color: #a1a1aa;
 }
+
+#timeLeft {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #facc15;
+}
 </style>
 </head>
 
 <body>
 
 <div class="box">
-    <h2>Kiwi Hub Key Sytems</h2>
-    <p>Bấm <b>Get Key</b> → Nhận Key 24h</p>
+    <h2>🔑 LOLIBEO GET KEY</h2>
+    <p>Bấm <b>GET KEY</b>Để Nhận Key 24H</p>
 
     <button id="btn" onclick="startGetKey()">GET KEY</button>
 
     <div class="note" id="status">Chưa lấy key</div>
     <div class="key" id="keyBox"></div>
+    <div class="note" id="timeLeft"></div>
 </div>
 
 <script>
 /* ================== CONFIG ================== */
+const KEY_LIFETIME = 24 * 60 * 60 * 1000; // 24 giờ
+const LINK4M_URL = "https://link4m.com/mWbel"; // Link4m của bạn
+let timerInterval = null;
 
-// ⏰ KEY SỐNG 24 GIỜ
-const KEY_LIFETIME = 24 * 60 * 60 * 1000;
-
-// 🔴 LINK4M CỦA BẠN (ĐÃ THAY)
-const LINK4M_URL = "https://link4m.com/mWbel";
-
-/* ============================================ */
-
-// 🔐 TẠO KEY RANDOM
+/* ================== FUNCTIONS ================== */
 function makeKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let key = "Kiwi-";
@@ -84,14 +86,43 @@ function makeKey() {
     return key;
 }
 
-// 👉 BẤM GET KEY → CHUYỂN LINK4M
 function startGetKey() {
-    document.getElementById("status").innerText = "Đang chuyển tới link vượt...";
+    document.getElementById("status").innerText = "⏳ Đang chuyển tới link vượt...";
     document.getElementById("btn").disabled = true;
     window.location.href = LINK4M_URL;
 }
 
-// ✅ KHI QUAY LẠI WEB
+function formatTime(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return `${h}h ${m}m ${s}s`;
+}
+
+function startCountdown(startTime) {
+    const timeBox = document.getElementById("timeLeft");
+
+    if (timerInterval) clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+        const left = KEY_LIFETIME - (Date.now() - startTime);
+
+        if (left <= 0) {
+            clearInterval(timerInterval);
+            localStorage.clear();
+            timeBox.innerText = "Key Đã Hết Hạn";
+            document.getElementById("keyBox").innerText = "";
+            document.getElementById("status").innerText = "Vui lòng lấy key mới";
+            document.title = "Key Hết Hạn";
+            return;
+        }
+
+        timeBox.innerText = "Thời Gian Còn Lại: " + formatTime(left);
+    }, 1000);
+}
+
+/* ================== ONLOAD ================== */
 window.onload = function () {
     const url = new URL(window.location.href);
     const verified = url.searchParams.get("verified");
@@ -100,24 +131,28 @@ window.onload = function () {
     const savedKey = localStorage.getItem("getkey_key");
     const savedTime = localStorage.getItem("getkey_time");
 
-    // ❌ Key đã dùng
+    // Key đã dùng
     if (used === "1") {
         document.getElementById("status").innerText = "Key đã được sử dụng";
+        document.getElementById("timeLeft").innerText = "";
+        document.title = "Key đã dùng";
         return;
     }
 
-    // ⏳ Key còn hạn
+    // Key còn hạn
     if (savedKey && savedTime) {
         if (Date.now() - Number(savedTime) < KEY_LIFETIME) {
             document.getElementById("keyBox").innerText = savedKey;
-            document.getElementById("status").innerText = "Hạn Sử Dụng 24H";
+            document.getElementById("status").innerText = "Thời Gian Còn Lại 24H";
+            startCountdown(Number(savedTime));
+            document.title = "Key còn hiệu lực";
             return;
         } else {
             localStorage.clear();
         }
     }
 
-    // 🎉 VƯỢT LINK XONG
+    // Vừa vượt Link4m xong
     if (verified === "1") {
         const key = makeKey();
         localStorage.setItem("getkey_key", key);
@@ -125,8 +160,10 @@ window.onload = function () {
         localStorage.setItem("key_used", "0");
 
         document.getElementById("keyBox").innerText = key;
-        document.getElementById("status").innerText = "🎉 Lấy Key Thành Công";
+        document.getElementById("status").innerText = "🎉 Lấy key thành công (24h / 1 lần)";
         document.getElementById("btn").disabled = false;
+        startCountdown(Date.now());
+        document.title = "Key sẵn sàng!";
     }
 };
 </script>
