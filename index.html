@@ -87,7 +87,7 @@ function makeKey() {
 }
 
 function startGetKey() {
-    document.getElementById("status").innerText = "⏳ Đang chuyển tới link vượt...";
+    document.getElementById("status").innerText = "Đang chuyển tới link vượt...";
     document.getElementById("btn").disabled = true;
     window.location.href = LINK4M_URL;
 }
@@ -160,7 +160,7 @@ window.onload = function () {
         localStorage.setItem("key_used", "0");
 
         document.getElementById("keyBox").innerText = key;
-        document.getElementById("status").innerText = "🎉 Lấy key thành công (24h / 1 lần)";
+        document.getElementById("status").innerText = "🎉 Lấy Key Thành Công";
         document.getElementById("btn").disabled = false;
         startCountdown(Date.now());
         document.title = "Key sẵn sàng!";
